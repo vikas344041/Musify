@@ -1,6 +1,8 @@
 package com.example.vikas.musify;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,9 +14,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private MediaPlayer mediaPlayer;
+    private double startTime = 0;
+    private double finalTime = 0;
+
+    private Handler myHandler = new Handler();;
+    private int forwardTime = 5000;
+    private int backwardTime = 5000;
+    private SeekBar seekbar;
+    private TextView tx2,tx3,tx4;
+    private ImageView btnPlayPause,btnPrevious,btnNext;
+    Boolean playing=false;
+
+    public static int oneTimeOnly = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +52,66 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.song);
+        seekbar = (SeekBar)findViewById(R.id.seekBar);
+        btnPlayPause=(ImageView) findViewById(R.id.button_play_pause);
+        btnNext=(ImageView)findViewById(R.id.button_next);
+        btnPrevious=(ImageView)findViewById(R.id.button_previous);
+        tx2=(TextView)findViewById(R.id.textView2);
+        tx3=(TextView)findViewById(R.id.textView3);
+        tx4=(TextView)findViewById(R.id.textView4);
+
+        seekbar.setClickable(false);
+        btnNext.setEnabled(false);
+        btnPrevious.setEnabled(false);
+
+        btnPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(playing==false){
+                    mediaPlayer.start();
+                    finalTime = mediaPlayer.getDuration();
+                    startTime = mediaPlayer.getCurrentPosition();
+
+                    if (oneTimeOnly == 0) {
+                        seekbar.setMax((int) finalTime);
+                        oneTimeOnly = 1;
+                    }
+
+                    tx3.setText(String.format("%d min, %d sec",
+                            TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
+                            TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                            finalTime)))
+                    );
+
+                    tx2.setText(String.format("%d min, %d sec",
+                            TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                            TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long)
+                                            startTime)))
+                    );
+
+                    seekbar.setProgress((int)startTime);
+                    myHandler.postDelayed(UpdateSongTime,100);
+                    btnNext.setEnabled(true);
+                    btnPrevious.setEnabled(false);
+                    playing=true;
+                    btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
+                    btnPlayPause.setPadding(0,0,8,0);
+
+                }
+                else{
+                    playing=false;
+                    mediaPlayer.pause();
+                    btnPrevious.setEnabled(false);
+                    btnNext.setEnabled(false);
+                    btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
+                    btnPlayPause.setPadding(8,0,0,0);
+                }
+            }
+        });
     }
 
     @Override
@@ -89,4 +170,18 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private Runnable UpdateSongTime = new Runnable() {
+        public void run() {
+            startTime = mediaPlayer.getCurrentPosition();
+            tx2.setText(String.format("%d min, %d sec",
+                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                    toMinutes((long) startTime)))
+            );
+            seekbar.setProgress((int)startTime);
+            myHandler.postDelayed(this, 100);
+        }
+    };
 }
