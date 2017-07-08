@@ -5,4 +5,46 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Select song</string>
+
+    <!-- Genre mapping-->
+    <string-array name="pop">
+        <item>a_team_ed_sheeran</item>
+        <item>sia</item>
+        <item>coldplay</item>
+        <item>katy</item>
+        <item>loyal</item>
+    </string-array>
+    <string-array name="rock">
+        <item>born</item>
+        <item>takeitof</item>
+        <item>train</item>
+        <item>starlight</item>
+        <item>welcome</item>
+    </string-array>
+    <string-array name="alternative">
+        <item>verve</item>
+        <item>yellow</item>
+        <item>falling</item>
+        <item>stereo</item>
+        <item>minority</item>
+    </string-array>
+    <string-array name="other">
+        <item>bad</item>
+        <item>jet</item>
+        <item>feel</item>
+        <item>tum</item>
+    </string-array>
+
+    <!-- States mapping-->
+    <string-array name="happy">
+        <item>pop</item>
+        <item>rock</item>
+    </string-array>
+    <string-array name="walking">
+        <item>alternative</item>
+        <item>rock</item>
+    </string-array>
+    <string-array name="relaxing">
+        <item>other</item>
+    </string-array>
 </resources>

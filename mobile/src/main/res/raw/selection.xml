@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Songs>
+    <pop>
+        <song>a_team_ed_sheeran</song>
+        <song>sia</song>
+    </pop>
+    <rock>
+        <song>born</song>
+    </rock>
+</Songs>
