@@ -1,8 +1,10 @@
 package com.example.vikas.musify;
 
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
@@ -14,6 +16,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -103,7 +107,6 @@ public class MainActivity extends AppCompatActivity
 
         //if (mApiClient.isConnected()) {
            // String s = ((MyApplication) this.getApplication()).getSomeVariable();
-            Toast.makeText(this, "walking", Toast.LENGTH_LONG).show();
             int stateID = getResources().getIdentifier("walking", "array", getPackageName());
             activityArray = getResources().getStringArray(stateID);
 
@@ -202,40 +205,54 @@ public class MainActivity extends AppCompatActivity
             //Intent myIntent = new Intent(MainActivity.this, Main2Activity.class);
             //MainActivity.this.startActivity(myIntent);
        // }
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(BReceiver, new IntentFilter("message"));
+    }
+
+    @Override
+    protected void onPause() {
+        // Unregister the broadcast receiver that was registered during onResume().
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(BReceiver);
+        super.onPause();
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Intent intent = new Intent( this, ActivityRecognizedService.class );
         PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 3000, pendingIntent );
-
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 10000, pendingIntent );
     }
-    Thread t = new Thread(new Runnable() {
-        public void run() {
-        /*
-         * Do something
-         */
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
+        // onConnectionFailed.
+        Log.i("MainActivity", "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason. We call connect() to
+        // attempt to re-establish the connection.
+        Log.i("MainActivity", "Connection suspended");
+        mApiClient.connect();
+    }
+
+
+    private BroadcastReceiver  BReceiver = new BroadcastReceiver(){
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //put here whaterver you want your activity to do with the intent received
+            Toast.makeText(getApplicationContext(),intent.getStringExtra("success"),Toast.LENGTH_LONG).show();
         }
-    });
 
-    t.start();
-
-    /*public void test(String somevariable){
-        int stateID = getResources().getIdentifier(somevariable, "array", getPackageName());
-        activityArray = getResources().getStringArray(stateID);
-    }*/
-
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
+    };
 
     public List<String> getSong(String genre)
     {

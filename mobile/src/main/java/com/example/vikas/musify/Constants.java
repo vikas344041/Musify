@@ -11,9 +11,12 @@ public class Constants {
     public enum Activities {
         RUNNING,
         RELAXING,
+        DRIVING,
+        BICYCLE_RIDING,
         SAD,
         HAPPY,
-        WALKING
+        WALKING,
+        WALKING_WITH_CONFIDENCE
     }
 
     public enum Genre {
