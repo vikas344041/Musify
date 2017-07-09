@@ -96,11 +96,11 @@
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:paddingLeft="6dp"
+            android:paddingLeft="0dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:id="@+id/button_play_pause"
-            android:src="@drawable/ic_action_playback_play"
+            android:src="@drawable/ic_action_playback_pause"
             android:background="@drawable/circular_button_background"/>
         <ImageView
             android:layout_width="30dp"

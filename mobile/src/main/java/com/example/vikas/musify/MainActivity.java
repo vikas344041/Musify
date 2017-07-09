@@ -31,24 +31,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , ServiceCallbacks{
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private MediaPlayer mediaPlayer;
     private double startTime = 0;
     private double finalTime = 0;
@@ -63,22 +55,17 @@ public class MainActivity extends AppCompatActivity
     Boolean playing=false;
     private String[] songArray;
     private String[] activityArray;
-    private SharedPreferences sharedPref;
-    public static final String MyPREFERENCES = "MyPrefs" ;
-    public static final String LastActivity = "lastActivity";
-    private Boolean hasActivityChanged=true;
     private List<Integer> songIDs = new ArrayList<Integer>();
     private Random random = new Random();
+    private Integer length=0;
 
     public static int oneTimeOnly = 0;
     public GoogleApiClient mApiClient;
+    public String lastActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+    protected void onStart() {
+        super.onStart();
 
         mApiClient = new GoogleApiClient.Builder(this)
                 .addApi(ActivityRecognition.API)
@@ -87,7 +74,14 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
         mApiClient.connect();
+    }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,116 +89,119 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        seekbar = (SeekBar) findViewById(R.id.seekBar);
+        btnPlayPause = (ImageView) findViewById(R.id.button_play_pause);
+        btnNext = (ImageView) findViewById(R.id.button_next);
+        btnPrevious = (ImageView) findViewById(R.id.button_previous);
+        tx2 = (TextView) findViewById(R.id.textView2);
+        tx3 = (TextView) findViewById(R.id.textView3);
+        tx4 = (TextView) findViewById(R.id.textView4);
+        image_art = (ImageView) findViewById(R.id.image_art);
 
-        //// TODO: 06/07/2017
+        lastActivity = "relaxing";
+        setSongArray(lastActivity);
 
 
-        //String state = Constants.STATE.toString();
 
-        //if (mApiClient.isConnected()) {
-           // String s = ((MyApplication) this.getApplication()).getSomeVariable();
-            int stateID = getResources().getIdentifier("walking", "array", getPackageName());
-            activityArray = getResources().getStringArray(stateID);
 
-            //get genres and songids
-            for (int i = 0; i < activityArray.length; i++) {
-                String genre = activityArray[i];
-                int rawID = getResources().getIdentifier(genre, "array", getPackageName());
-                songArray = getResources().getStringArray(rawID);
-                for (int j = 0; j < songArray.length; j++) {
-                    songIDs.add(getResources().getIdentifier(songArray[j], "raw", getPackageName()));
+        seekbar.setClickable(false);
+       // btnNext.setEnabled(false);
+        btnPrevious.setEnabled(false);
+
+        btnPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (playing == false) {
+                    if(!length.equals(0)){
+                        mediaPlayer.seekTo(length);
+                        mediaPlayer.start();
+                        length=0;
+                    }
+                    else{
+                        setCurrentUIandPlay();
+                    }
+                    seekbar.setProgress((int) startTime);
+                    myHandler.postDelayed(UpdateSongTime, 100);
+                    btnNext.setEnabled(true);
+                    btnPrevious.setEnabled(false);
+                    playing = true;
+                    btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
+                    btnPlayPause.setPadding(0, 0, 8, 0);
+
+                } else {
+                    playing = false;
+                    mediaPlayer.pause();
+                    length=mediaPlayer.getCurrentPosition();
+                    btnPrevious.setEnabled(false);
+                    btnNext.setEnabled(false);
+                    btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
+                    btnPlayPause.setPadding(8, 0, 0, 0);
                 }
             }
-            sharedPref = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            String recentActivity = sharedPref.getString(LastActivity, "");
-            if (!recentActivity.equalsIgnoreCase("walking")) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(LastActivity, "walking");
-                hasActivityChanged = true;
-            } else {
-                hasActivityChanged = false;
-            }
+        });
 
-            int val = random.nextInt(activityArray.length);
-            String genre = activityArray[val];
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    setCurrentUIandPlay();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+       mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                try {
+                    setCurrentUIandPlay();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+    private void setSongArray(String state) {
+
+        int stateID = getResources().getIdentifier(state.toLowerCase(), "array", getPackageName());
+        activityArray = getResources().getStringArray(stateID);
+
+        for (int i = 0; i < activityArray.length; i++) {
+            String genre = activityArray[i];
             int rawID = getResources().getIdentifier(genre, "array", getPackageName());
             songArray = getResources().getStringArray(rawID);
-
-            val = random.nextInt(songArray.length);
-            final String song = songArray[val];
-            rawID = getResources().getIdentifier(song, "raw", getPackageName());
-            mediaPlayer = MediaPlayer.create(this, rawID);
-            seekbar = (SeekBar) findViewById(R.id.seekBar);
-            btnPlayPause = (ImageView) findViewById(R.id.button_play_pause);
-            btnNext = (ImageView) findViewById(R.id.button_next);
-            btnPrevious = (ImageView) findViewById(R.id.button_previous);
-            tx2 = (TextView) findViewById(R.id.textView2);
-            tx3 = (TextView) findViewById(R.id.textView3);
-            tx4 = (TextView) findViewById(R.id.textView4);
-            image_art = (ImageView) findViewById(R.id.image_art);
-
-            seekbar.setClickable(false);
-            btnNext.setEnabled(false);
-            btnPrevious.setEnabled(false);
-
-            //Toast.makeText(this, genre, Toast.LENGTH_SHORT).show();
-
-            btnPlayPause.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (playing == false) {
-
-                        setCurrentUIandPlay();
-
-                        seekbar.setProgress((int) startTime);
-                        myHandler.postDelayed(UpdateSongTime, 100);
-                        btnNext.setEnabled(true);
-                        btnPrevious.setEnabled(false);
-                        playing = true;
-                        btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
-                        btnPlayPause.setPadding(0, 0, 8, 0);
-
-                    } else {
-                        playing = false;
-                        mediaPlayer.pause();
-                        btnPrevious.setEnabled(false);
-                        btnNext.setEnabled(false);
-                        btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
-                        btnPlayPause.setPadding(8, 0, 0, 0);
-                    }
-                }
-            });
-
-            btnNext.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        setCurrentUIandPlay();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-
-        /*while (s == null ){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            for (int j = 0; j < songArray.length; j++) {
+                songIDs.add(getResources().getIdentifier(songArray[j], "raw", getPackageName()));
             }
-            s = ((MyApplication) this.getApplication()).getSomeVariable();
-        }*/
+        }
 
+        int val = random.nextInt(activityArray.length);
+        String genre = activityArray[val];
+        int rawID = getResources().getIdentifier(genre, "array", getPackageName());
+        songArray = getResources().getStringArray(rawID);
 
-            //Intent myIntent = new Intent(MainActivity.this, Main2Activity.class);
-            //MainActivity.this.startActivity(myIntent);
-       // }
+        val = random.nextInt(songArray.length);
+        final String song = songArray[val];
+        rawID = getResources().getIdentifier(song, "raw", getPackageName());
+        if ( mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
+            }
+        }
+        mediaPlayer = MediaPlayer.create(this, rawID);
+        mediaPlayer.start();
+        btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
+
+        setCurrentUI(rawID);
+        playing = true;
 
     }
 
@@ -225,7 +222,7 @@ public class MainActivity extends AppCompatActivity
     public void onConnected(@Nullable Bundle bundle) {
         Intent intent = new Intent( this, ActivityRecognizedService.class );
         PendingIntent pendingIntent = PendingIntent.getService( this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 10000, pendingIntent );
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates( mApiClient, 3000, pendingIntent );
     }
 
     @Override
@@ -249,78 +246,15 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             //put here whaterver you want your activity to do with the intent received
-            Toast.makeText(getApplicationContext(),intent.getStringExtra("success"),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"here "+intent.getStringExtra("success"),Toast.LENGTH_LONG).show();
+            if(!lastActivity.equalsIgnoreCase(intent.getStringExtra("success"))){
+                lastActivity = intent.getStringExtra("success");
+                setSongArray(intent.getStringExtra("success").toLowerCase());
+
+            }
         }
 
     };
-
-    public List<String> getSong(String genre)
-    {
-        XmlPullParserFactory pullParserFactory;
-        try {
-            InputStream ins = getResources().openRawResource(
-                    getResources().getIdentifier("selection",
-                            "raw", getPackageName()));
-            pullParserFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = pullParserFactory.newPullParser();
-
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(ins, null);
-
-            List<String> song =parseXML(parser, genre);
-            return song;
-
-        } catch (XmlPullParserException e) {
-
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private List<String> parseXML(XmlPullParser parser, String genre) throws XmlPullParserException,IOException {
-
-        ArrayList<ReadMp3File> deserialize = null;
-        List<String> songs;
-        int eventType = parser.getEventType();
-        ReadMp3File file = null;
-
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            String name = null;
-            switch (eventType) {
-                case XmlPullParser.START_DOCUMENT:
-                    deserialize = new ArrayList();
-                    break;
-                case XmlPullParser.START_TAG:
-                    name = parser.getName();
-                    if (name.equalsIgnoreCase(genre)) {
-
-                        songs = new ArrayList<String>();
-                        while(parser.next() != 0){
-                            songs.add(parser.nextText());
-                        }
-                    }/* else if (file != null) {
-                        if (name.equalsIgnoreCase("song")) {
-                            songs.add(parser.nextText());
-                            file.song = parser.nextText();
-                            Toast.makeText(this, file.song, Toast.LENGTH_SHORT).show();
-                            return file.song;
-                        }
-                    }*/
-                    break;
-                /*case XmlPullParser.END_TAG:
-                    name = parser.getName();
-                    if (name.equalsIgnoreCase("genre") && file != null) {
-                        products.add(file);
-                    }*/
-            }
-            eventType = parser.next();
-        }
-        return null;
-    }
-
 
         @Override
     public void onBackPressed() {
@@ -395,18 +329,23 @@ public class MainActivity extends AppCompatActivity
 
     private void setCurrentUIandPlay(){
         mediaPlayer.stop();
+        btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
         mediaPlayer.reset();
         int rawId = songIDs.get(random.nextInt(songIDs.size()));
         mediaPlayer = MediaPlayer.create(getApplicationContext(),rawId);
         mediaPlayer.start();
+        btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
+        setCurrentUI(rawId);
+    }
+
+    private void setCurrentUI(int rawId){
+        myHandler.postDelayed(UpdateSongTime, 100);
         finalTime = mediaPlayer.getDuration();
         startTime = mediaPlayer.getCurrentPosition();
-
         if (oneTimeOnly == 0) {
             seekbar.setMax((int) finalTime);
             oneTimeOnly = 1;
         }
-
         tx3.setText(String.format("%d min, %d sec",
                 TimeUnit.MILLISECONDS.toMinutes((long) finalTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) finalTime) -
@@ -421,7 +360,6 @@ public class MainActivity extends AppCompatActivity
                                 startTime)))
         );
 
-        //tx4.setText(getResources().getResourceEntryName(rawId));
 
         Uri mediaPath = Uri.parse("android.resource://" + getPackageName() + "/" + rawId);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -438,11 +376,5 @@ public class MainActivity extends AppCompatActivity
         else {
             image_art.setImageResource(R.drawable.songimg);
         }
-
-    }
-
-    @Override
-    public void doSomething() {
-
     }
 }

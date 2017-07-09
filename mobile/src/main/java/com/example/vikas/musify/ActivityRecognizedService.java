@@ -22,6 +22,8 @@ public class ActivityRecognizedService extends IntentService {
         super(name);
     }
 
+    private Constants.Activities State;
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if(ActivityRecognitionResult.hasResult(intent)) {
@@ -31,6 +33,7 @@ public class ActivityRecognizedService extends IntentService {
 
             // Get the confidence % (probability)
             int confidence = mostProbableActivity.getConfidence();
+            Log.e("ActivityRecogition", "In confidence: " + confidence);
             // Get the type
             int activityType = mostProbableActivity.getType();
 
@@ -38,123 +41,66 @@ public class ActivityRecognizedService extends IntentService {
                 case DetectedActivity.IN_VEHICLE: {
                     if (confidence > 75) {
                         Log.e("ActivityRecogition", "In Vehicle: " + confidence);
-                        Constants.STATE = Constants.Activities.DRIVING;
+                        State = Constants.Activities.DRIVING;
                     } else {
                         Log.e("ActivityRecogition", "In Vehicle: " + confidence);
-                        Constants.STATE = Constants.Activities.WALKING;
+                        State = Constants.Activities.WALKING;
                     }
                     break;
                 }
                 case DetectedActivity.ON_BICYCLE: {
                     Log.e( "ActivityRecogition", "On Bicycle: " + confidence );
-                    Constants.STATE=Constants.Activities.BICYCLE_RIDING;
+                    State = Constants.Activities.BICYCLE_RIDING;
                     break;
                 }
                 case DetectedActivity.ON_FOOT: {
                     Log.e( "ActivityRecogition", "On Foot: " + confidence );
-                    Constants.STATE=Constants.Activities.WALKING;
+                    State = Constants.Activities.WALKING;
                     break;
                 }
                 case DetectedActivity.RUNNING: {
                     Log.e( "ActivityRecogition", "Running: " + confidence );
-                    Constants.STATE = Constants.Activities.RUNNING;
+                    State = Constants.Activities.RUNNING;
                     break;
                 }
                 case DetectedActivity.STILL: {
                     Log.e( "ActivityRecogition", "Still: " + confidence );
-                    Constants.STATE = Constants.Activities.RELAXING;
+                    State = Constants.Activities.RELAXING;
                     break;
                 }
                 case DetectedActivity.TILTING: {
                     Log.e( "ActivityRecogition", "Tilting: " + confidence );
-                    Constants.STATE = Constants.Activities.RELAXING;
+                    State = Constants.Activities.WALKING;
                     break;
                 }
                 case DetectedActivity.WALKING: {
                     Log.e( "ActivityRecogition", "Walking: " + confidence );
                     if( confidence >= 75 ) {
-                        Constants.STATE = Constants.Activities.WALKING;
+                        State = Constants.Activities.WALKING;
                     }
                     else{
-                        Constants.STATE = Constants.Activities.RELAXING;
+                        State = Constants.Activities.RELAXING;
                     }
 
                     break;
                 }
                 case DetectedActivity.UNKNOWN: {
                     Log.e( "ActivityRecogition", "Unknown: " + confidence );
-                    Constants.STATE = Constants.Activities.HAPPY;
+                    State = Constants.Activities.HAPPY;
                     break;
                 }
             }
-            senResultBackToActivity();
+            if (confidence > 75){
+                sendResultBackToActivity();
+            }
+
 
         }
     }
 
-    private void senResultBackToActivity(){
+    private void sendResultBackToActivity(){
         Intent intent = new Intent ("message"); //put the same message as in the filter you used in the activity when registering the receiver
-        intent.putExtra("success", Constants.STATE.toString());
+        intent.putExtra("success", State.toString());
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
-    private void handleDetectedActivities(List<DetectedActivity> probableActivities) {
-        for( DetectedActivity activity : probableActivities ) {
-            switch( activity.getType() ) {
-                case DetectedActivity.IN_VEHICLE: {
-                    Log.e( "ActivityRecogition", "In Vehicle: " + activity.getConfidence() );
-                    Constants.STATE=Constants.Activities.DRIVING;
-                    break;
-                }
-                case DetectedActivity.ON_BICYCLE: {
-                    Log.e( "ActivityRecogition", "On Bicycle: " + activity.getConfidence() );
-                    Constants.STATE=Constants.Activities.BICYCLE_RIDING;
-                    break;
-                }
-                case DetectedActivity.ON_FOOT: {
-                    Log.e( "ActivityRecogition", "On Foot: " + activity.getConfidence() );
-                    Constants.STATE=Constants.Activities.WALKING;
-                    break;
-                }
-                case DetectedActivity.RUNNING: {
-                    Log.e( "ActivityRecogition", "Running: " + activity.getConfidence() );
-                    Constants.STATE = Constants.Activities.RUNNING;
-                    break;
-                }
-                case DetectedActivity.STILL: {
-                    Log.e( "ActivityRecogition", "Still: " + activity.getConfidence() );
-                    Constants.STATE = Constants.Activities.RELAXING;
-                    break;
-                }
-                case DetectedActivity.TILTING: {
-                    Log.e( "ActivityRecogition", "Tilting: " + activity.getConfidence() );
-                    Constants.STATE = Constants.Activities.RELAXING;
-                    break;
-                }
-                case DetectedActivity.WALKING: {
-                    Log.e( "ActivityRecogition", "Walking: " + activity.getConfidence() );
-                    if( activity.getConfidence() >= 75 ) {
-                        Constants.STATE = Constants.Activities.WALKING_WITH_CONFIDENCE;
-                        ((MyApplication) this.getApplication()).setSomeVariable("walking");
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                        builder.setContentText( "Are you walking?" );
-                        builder.setSmallIcon( R.mipmap.ic_launcher );
-                        builder.setContentTitle( getString( R.string.app_name ) );
-                        NotificationManagerCompat.from(this).notify(0, builder.build());
-                    }
-                    Constants.STATE = Constants.Activities.RELAXING;
-                    break;
-                }
-                case DetectedActivity.UNKNOWN: {
-                    Log.e( "ActivityRecogition", "Unknown: " + activity.getConfidence() );
-                    Constants.STATE = Constants.Activities.HAPPY;
-                    break;
-                }
-
-            }
-            Intent intent = new Intent ("message"); //put the same message as in the filter you used in the activity when registering the receiver
-            intent.putExtra("success", Constants.STATE.toString());
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        }
     }
 }

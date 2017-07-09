@@ -16,7 +16,6 @@ public class Constants {
         SAD,
         HAPPY,
         WALKING,
-        WALKING_WITH_CONFIDENCE
     }
 
     public enum Genre {
