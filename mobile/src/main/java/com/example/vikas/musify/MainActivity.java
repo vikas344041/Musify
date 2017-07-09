@@ -281,11 +281,20 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+            return true;
+        }
+        if(id==R.id.action_export){
+            showSensorGraph();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSensorGraph(){
+        Intent intent=new Intent(MainActivity.this,MainActivity2.class);
+        startActivity(intent);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
