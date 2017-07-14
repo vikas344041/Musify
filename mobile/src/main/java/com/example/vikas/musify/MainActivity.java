@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -27,6 +28,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -40,7 +43,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private MediaPlayer mediaPlayer;
     private double startTime = 0;
     private double finalTime = 0;
@@ -51,13 +54,14 @@ public class MainActivity extends AppCompatActivity
     private SeekBar seekbar;
     private TextView tx2,tx3,tx4;
     private ImageView image_art;
-    private ImageView btnPlayPause,btnPrevious,btnNext;
+    private ImageView btnPlayPause,btnPrevious,btnNext,btnHeartRate;
     Boolean playing=false;
     private String[] songArray;
     private String[] activityArray;
     private List<Integer> songIDs = new ArrayList<Integer>();
     private Random random = new Random();
     private Integer length=0;
+    private static int val = 0;
 
     public static int oneTimeOnly = 0;
     public GoogleApiClient mApiClient;
@@ -79,18 +83,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         seekbar = (SeekBar) findViewById(R.id.seekBar);
         btnPlayPause = (ImageView) findViewById(R.id.button_play_pause);
@@ -99,7 +94,9 @@ public class MainActivity extends AppCompatActivity
         tx2 = (TextView) findViewById(R.id.textView2);
         tx3 = (TextView) findViewById(R.id.textView3);
         tx4 = (TextView) findViewById(R.id.textView4);
+        tx4.setSelected(true);
         image_art = (ImageView) findViewById(R.id.image_art);
+        btnHeartRate=(ImageView) findViewById(R.id.button_heart_rate);
 
         lastActivity = "relaxing";
         setSongArray(lastActivity);
@@ -108,8 +105,8 @@ public class MainActivity extends AppCompatActivity
 
 
         seekbar.setClickable(false);
-       // btnNext.setEnabled(false);
-        btnPrevious.setEnabled(false);
+        // btnNext.setEnabled(false);
+        btnPrevious.setEnabled(true);
 
         btnPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +123,7 @@ public class MainActivity extends AppCompatActivity
                     seekbar.setProgress((int) startTime);
                     myHandler.postDelayed(UpdateSongTime, 100);
                     btnNext.setEnabled(true);
-                    btnPrevious.setEnabled(false);
+                    btnPrevious.setEnabled(true);
                     playing = true;
                     btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
                     btnPlayPause.setPadding(0, 0, 8, 0);
@@ -135,7 +132,7 @@ public class MainActivity extends AppCompatActivity
                     playing = false;
                     mediaPlayer.pause();
                     length=mediaPlayer.getCurrentPosition();
-                    btnPrevious.setEnabled(false);
+                    btnPrevious.setEnabled(true);
                     btnNext.setEnabled(false);
                     btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
                     btnPlayPause.setPadding(8, 0, 0, 0);
@@ -155,7 +152,29 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-       mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        btnPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if(mediaPlayer.getCurrentPosition() != 0){
+                        mediaPlayer.seekTo(0);
+                        mediaPlayer.start();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        btnHeartRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,MainActivity2.class);
+                startActivity(intent);
+            }
+        });
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 try {
@@ -182,24 +201,25 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        int val = random.nextInt(activityArray.length);
-        String genre = activityArray[val];
+        //int val = random.nextInt(activityArray.length);
+        String genre = activityArray[(val++)%activityArray.length];
         int rawID = getResources().getIdentifier(genre, "array", getPackageName());
         songArray = getResources().getStringArray(rawID);
 
-        val = random.nextInt(songArray.length);
-        final String song = songArray[val];
+        //val = random.nextInt(songArray.length);
+        final String song = songArray[(val++)%songArray.length];
         rawID = getResources().getIdentifier(song, "raw", getPackageName());
         if ( mediaPlayer != null) {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();
                 btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
+                btnPlayPause.setPadding(8, 0, 0, 0);
             }
         }
         mediaPlayer = MediaPlayer.create(this, rawID);
         mediaPlayer.start();
         btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
-
+        btnPlayPause.setPadding(0, 0, 8, 0);
         setCurrentUI(rawID);
         playing = true;
 
@@ -256,14 +276,9 @@ public class MainActivity extends AppCompatActivity
 
     };
 
-        @Override
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -297,31 +312,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_heart) {
-            // Handle the camera action
-        } else if (id == R.id.nav_steps) {
-
-        } else if (id == R.id.nav_location) {
-
-        } else if (id == R.id.nav_weather) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     private Runnable UpdateSongTime = new Runnable() {
         public void run() {
             startTime = mediaPlayer.getCurrentPosition();
@@ -339,11 +329,13 @@ public class MainActivity extends AppCompatActivity
     private void setCurrentUIandPlay(){
         mediaPlayer.stop();
         btnPlayPause.setImageResource(R.drawable.ic_action_playback_play);
+        btnPlayPause.setPadding(8, 0, 0, 0);
         mediaPlayer.reset();
-        int rawId = songIDs.get(random.nextInt(songIDs.size()));
+        int rawId = songIDs.get((val++)%songIDs.size());
         mediaPlayer = MediaPlayer.create(getApplicationContext(),rawId);
         mediaPlayer.start();
         btnPlayPause.setImageResource(R.drawable.ic_action_playback_pause);
+        btnPlayPause.setPadding(0, 0, 8, 0);
         setCurrentUI(rawId);
     }
 
@@ -376,6 +368,11 @@ public class MainActivity extends AppCompatActivity
         String text = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
 
         tx4.setText(text);
+        tx4.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        tx4.setSingleLine(true);
+        tx4.setMarqueeRepeatLimit(1000);
+        tx4.setMaxLines(1);
+        tx4.setSelected(true);
 
         byte[] art = mmr.getEmbeddedPicture();
         if (art != null) {

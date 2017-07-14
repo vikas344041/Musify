@@ -34,4 +34,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="NoActionBarAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!--Customize your theme here. -->
+        <item name="windowActionBar">false</item>
+        <!--colorPrimary is used for coloring the Toolbar -->
+    </style>
+
 </resources>

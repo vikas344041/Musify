@@ -34,6 +34,19 @@
         <item>feel</item>
         <item>tum</item>
     </string-array>
+    <string-array name="mix1">
+        <item>lift</item>
+        <item>howyouremindme</item>
+        <item>fireflies</item>
+        <item>payphone</item>
+        <item>shineon</item>
+    </string-array>
+    <string-array name="mix2">
+        <item>millionaire</item>
+        <item>cowgirls</item>
+        <item>shineon</item>
+        <item>payphone</item>
+    </string-array>
 
     <!-- States mapping-->
     <string-array name="happy">
@@ -45,6 +58,15 @@
         <item>rock</item>
     </string-array>
     <string-array name="relaxing">
+        <item>other</item>
+    </string-array>
+    <string-array name="running">
+        <item>mix1</item>
+    </string-array>
+    <string-array name="driving">
+        <item>mix2</item>
+    </string-array>
+    <string-array name="sad">
         <item>other</item>
     </string-array>
 
