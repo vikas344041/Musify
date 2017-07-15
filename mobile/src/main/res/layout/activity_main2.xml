@@ -9,9 +9,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
-        <android.support.v7.widget.Toolbar
+        <!-- <android.support.v7.widget.Toolbar
             android:id="@+id/my_awesome_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
             android:elevation="8dp"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>-->
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -43,49 +44,6 @@
 
         </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFcccccc"
-            android:elevation="8dp"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/tagname"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-                    android:hint="tag name"/>
-            </android.support.design.widget.TextInputLayout>
-
-            <Button
-                android:id="@+id/tag_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="8dp"
-                android:text="tag"/>
-
-
-        </LinearLayout>
-
-
     </LinearLayout>
-
-
-    <android.support.design.widget.NavigationView
-        android:id="@+id/navView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/drawer_layout"/>
 
 </android.support.v4.widget.DrawerLayout>

@@ -34,7 +34,6 @@ public class SensorGraphView extends View {
     private LinkedList<TagData> tags = new LinkedList<>();
     private boolean[] drawSensors = new boolean[NUM_DRAW_SENSOR];
     private Paint infoPaint;
-    private Paint tagPaint;
     private ArrayList<Float>[] normalisedDataPoints;
     private ArrayList<Integer>[] dataPointsAccuracy;
     private ArrayList<Long>[] dataPointsTimeStamps;
@@ -79,9 +78,7 @@ public class SensorGraphView extends View {
         infoPaint.setTextSize(48f);
         infoPaint.setAntiAlias(true);
 
-        tagPaint = new Paint();
-        tagPaint.setColor(res.getColor(R.color.graph_color_info));
-        tagPaint.setAntiAlias(true);
+
 
     }
 
@@ -288,7 +285,7 @@ public class SensorGraphView extends View {
                     if (previousTimeStamp != -1) {
                         int nextIndexToDraw = findStartingIndexForTag(previousTimeStamp / 1000000, dataPointsTimeStamps[i].get(index) / 1000000, lastDrawnTagIndex + 1);
                         if (nextIndexToDraw != -1) {
-                            drawTag(canvas, this.tags.get(nextIndexToDraw), previousX + ((currentX - previousX) / 2));
+                            //drawTag(canvas, this.tags.get(nextIndexToDraw), previousX + ((currentX - previousX) / 2));
                             lastDrawnTagIndex = nextIndexToDraw;
                         }
                     }
@@ -308,9 +305,7 @@ public class SensorGraphView extends View {
         }
     }
 
-    private void drawTag(Canvas canvas, TagData tag, float x) {
-        canvas.drawRect(x - 3, 0 + 1, x + 3, canvas.getHeight() - 1, tagPaint);
-    }
+
 
 
     private int findStartingIndexForTag(long startTimestamp, long endTimestamp, int startIndex) {

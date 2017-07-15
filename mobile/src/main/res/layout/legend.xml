@@ -2,7 +2,11 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="@layout/fragment_sensor">
-
+<LinearLayout
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="#FF6274D7">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,7 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 1"
+                android:text="Heart Rate"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -49,7 +54,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 2"
+                android:text="Acceleration"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -79,8 +85,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 3"
-                android:textSize="16sp" />
+                android:text="Gravity"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                />
         </LinearLayout>
 
 
@@ -102,7 +110,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 4"
+                android:text="Rotation"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -135,7 +144,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 5"
+                android:text="Light"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -158,10 +168,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="Sensor 6"
+                android:text="Gyroscope"
+                android:textColor="#ffffff"
                 android:textSize="16sp" />
         </LinearLayout>
 
 
     </LinearLayout>
+</LinearLayout>
 </merge>

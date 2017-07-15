@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             //put here whaterver you want your activity to do with the intent received
-            Toast.makeText(getApplicationContext(),"here "+intent.getStringExtra("success"),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),intent.getStringExtra("success"),Toast.LENGTH_LONG).show();
             if(!lastActivity.equalsIgnoreCase(intent.getStringExtra("success"))){
                 lastActivity = intent.getStringExtra("success");
                 setSongArray(intent.getStringExtra("success").toLowerCase());

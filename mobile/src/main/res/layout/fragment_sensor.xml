@@ -5,12 +5,13 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:clipToPadding="false"
-    android:padding="8dp">
+    android:padding="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="#ffffff"
         >
 
         <TextView
@@ -19,9 +20,15 @@
             android:textSize="24sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="sensor"
+            android:text="Heart Rate"
             android:gravity="center"
             android:layout_gravity="center"
+            android:lines="1"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            style="@style/autoscroll"
             />
 
 
@@ -29,8 +36,8 @@
             android:id="@+id/graph_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/graph_view_height"
-            android:background="#e0e0e0"
-            android:layout_marginBottom="8dp"
+            android:background="#FFD5FCFF"
+            android:layout_marginBottom="85dp"
             />
 
         <include layout="@layout/legend"/>

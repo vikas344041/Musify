@@ -18,7 +18,6 @@ public class SensorNames {
         names.append(Sensor.TYPE_GRAVITY, "Gravity");
         names.append(Sensor.TYPE_GYROSCOPE, "Gyroscope");
         names.append(Sensor.TYPE_GYROSCOPE_UNCALIBRATED, "Gyroscope (Uncalibrated)");
-        names.append(Sensor.TYPE_HEART_RATE, "Heart Rate");
         names.append(Sensor.TYPE_LIGHT, "Light");
         names.append(Sensor.TYPE_LINEAR_ACCELERATION, "Linear Acceleration");
         names.append(Sensor.TYPE_MAGNETIC_FIELD, "Magnetic Field");
@@ -30,6 +29,8 @@ public class SensorNames {
         names.append(Sensor.TYPE_SIGNIFICANT_MOTION, "Significant Motion");
         names.append(Sensor.TYPE_STEP_COUNTER, "Step Counter");
         names.append(Sensor.TYPE_STEP_DETECTOR, "Step Detector");
+
+        names.append(Sensor.TYPE_HEART_RATE, "Heart Rate");
     }
 
     public String getName(int sensorId) {

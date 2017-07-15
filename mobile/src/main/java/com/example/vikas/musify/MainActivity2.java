@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -40,61 +41,21 @@ public class MainActivity2 extends AppCompatActivity implements NavigationView.O
 
     private ViewPager pager;
     private View emptyState;
-    private NavigationView mNavigationView;
-    private Menu mNavigationViewMenu;
     private List<Node> mNodes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main2);
 
         mToolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
         emptyState = findViewById(R.id.empty_state);
 
-        mNavigationView = (NavigationView) findViewById(R.id.navView);
-        mNavigationView.setNavigationItemSelectedListener(this);
-        mNavigationViewMenu = mNavigationView.getMenu();
-
-        initToolbar();
         initViewPager();
 
         remoteSensorManager = RemoteSensorManager.getInstance(this);
-
-        final EditText tagname = (EditText) findViewById(R.id.tagname);
-
-        findViewById(R.id.tag_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tagnameText = "EMPTY";
-                if (!tagname.getText().toString().isEmpty()) {
-                    tagnameText = tagname.getText().toString();
-                }
-
-                RemoteSensorManager.getInstance(MainActivity2.this).addTag(tagnameText);
-            }
-        });
-
-        tagname.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                if (event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                    in.hideSoftInputFromWindow(tagname
-                                    .getApplicationWindowToken(),
-                            InputMethodManager.HIDE_NOT_ALWAYS);
-
-
-                    return true;
-
-                }
-                return false;
-            }
-        });
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
@@ -138,7 +99,9 @@ public class MainActivity2 extends AppCompatActivity implements NavigationView.O
                 if (adapter != null) {
                     Sensor sensor = adapter.getItemObject(id);
                     if (sensor != null) {
-                        remoteSensorManager.filterBySensorId((int) sensor.getId());
+                        //remoteSensorManager.filterBySensorId((int) sensor.getId());
+                        remoteSensorManager.filterBySensorId(21);
+
                     }
                 }
             }
@@ -172,8 +135,7 @@ public class MainActivity2 extends AppCompatActivity implements NavigationView.O
 
         remoteSensorManager.startMeasurement();
 
-        mNavigationViewMenu.clear();
-        remoteSensorManager.getNodes(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+        /*remoteSensorManager.getNodes(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(final NodeApi.GetConnectedNodesResult pGetConnectedNodesResult) {
                 mNodes = pGetConnectedNodesResult.getNodes();
@@ -190,7 +152,7 @@ public class MainActivity2 extends AppCompatActivity implements NavigationView.O
                     }
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -239,7 +201,7 @@ public class MainActivity2 extends AppCompatActivity implements NavigationView.O
 
 
     private void notifyUSerForNewSensor(Sensor sensor) {
-        Toast.makeText(this, "New Sensor!\n" + sensor.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "New Sensor!\n" + sensor.getName()+ " "+sensor.getId(), Toast.LENGTH_SHORT).show();
     }
 
 

@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,6 +93,11 @@ public class SensorFragment extends Fragment {
 
 
         ((TextView) view.findViewById(R.id.title)).setText(sensor.getName());
+        ((TextView) view.findViewById(R.id.title)).setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        ((TextView) view.findViewById(R.id.title)).setSingleLine(true);
+        ((TextView) view.findViewById(R.id.title)).setMarqueeRepeatLimit(1000);
+        ((TextView) view.findViewById(R.id.title)).setMaxLines(1);
+        ((TextView) view.findViewById(R.id.title)).setSelected(true);
 
         sensorview = (SensorGraphView) view.findViewById(R.id.graph_view);
 
